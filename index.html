@@ -10,7 +10,8 @@
 :root{
   --bg:#F7F5F0;--card:#fff;--ink:#1A1A1A;--ink2:#555550;--ink3:#99998F;
   --accent:#2D5A3D;--accent-l:#EAF2EC;--accent2:#C8512A;--accent2-l:#FDF0EB;
-  --border:#E5E2DA;--border2:#CCC9C0;--mono:'DM Mono',monospace;--sans:'Noto Sans TC',sans-serif;
+  --border:#E5E2DA;--border2:#CCC9C0;
+  --mono:'DM Mono',monospace;--sans:'Noto Sans TC',sans-serif;
 }
 body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:100vh;padding:2rem 1rem 5rem}
 .wrap{max-width:640px;margin:0 auto}
@@ -24,18 +25,17 @@ input:focus,select:focus{border-color:var(--accent)}
 input::placeholder{color:var(--border2)}
 .hint{font-size:.7rem;font-family:var(--mono);color:var(--ink3);margin-top:.4rem;line-height:1.5}
 .btn{width:100%;padding:.85rem;border:none;border-radius:10px;font-family:var(--sans);font-size:.9rem;font-weight:500;cursor:pointer;transition:all .2s;margin-top:.5rem}
-.btn-primary{background:var(--ink);color:#fff}.btn-primary:hover{background:var(--accent);transform:translateY(-1px)}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:hover{background:var(--accent);transform:translateY(-1px)}
 .btn-primary:disabled{background:var(--border2);cursor:not-allowed;transform:none}
-.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--ink2)}.btn-outline:hover{border-color:var(--ink);color:var(--ink)}
-.tag{display:inline-block;font-size:.65rem;font-family:var(--mono);padding:.2rem .5rem;border-radius:4px;letter-spacing:.04em}
-.tag-ok{background:var(--accent-l);color:var(--accent)}
-.tag-err{background:var(--accent2-l);color:var(--accent2)}
-#status{font-size:.78rem;font-family:var(--mono);color:var(--ink3);margin-top:.5rem;min-height:1.2rem;text-align:center}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--ink2);font-size:.8rem;padding:.5rem 1rem;width:auto;margin-top:.75rem}
+.btn-outline:hover{border-color:var(--ink);color:var(--ink)}
+#status{font-size:.78rem;font-family:var(--mono);color:var(--ink3);margin-top:.6rem;min-height:1.2rem;text-align:center}
 .spinner{display:inline-block;width:12px;height:12px;border:1.5px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin-right:6px;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
 .result-block{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:.75rem;animation:fadeIn .3s ease}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.result-head{background:var(--ink);color:#fff;padding:.65rem 1.1rem;font-size:.65rem;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between}
+.result-head{background:var(--ink);color:#fff;padding:.65rem 1.1rem;font-size:.65rem;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
 .bal-grid{display:grid;grid-template-columns:1fr 1fr}
 .bal-item{padding:.75rem 1.1rem;border-bottom:1px solid var(--border);border-right:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.875rem}
 .bal-item:nth-child(even){border-right:none}
@@ -51,11 +51,11 @@ input::placeholder{color:var(--border2)}
 .t-to{font-weight:500;flex:1;text-align:right}
 .t-amt{font-family:var(--mono);font-weight:500;color:var(--accent);min-width:72px;text-align:right}
 .settled{text-align:center;padding:1.5rem;font-family:var(--mono);font-size:.78rem;color:var(--ink3)}
-.divider{display:flex;align-items:center;gap:.75rem;margin:.75rem 0}
-.divider-line{flex:1;height:1px;background:var(--border)}
-.divider-text{font-size:.65rem;font-family:var(--mono);color:var(--ink3);letter-spacing:.06em}
-#token-section{animation:fadeIn .3s ease}
-.success-row{display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--accent);font-family:var(--mono)}
+.notion-link{display:block;text-align:center;margin-top:.5rem;font-size:.75rem;font-family:var(--mono);color:var(--accent);text-decoration:none;letter-spacing:.04em}
+.notion-link:hover{text-decoration:underline}
+.setup-row{display:flex;gap:.5rem;align-items:center;margin-top:.5rem}
+.setup-row input{flex:1}
+.setup-row button{width:auto;padding:.55rem 1rem;margin-top:0;font-size:.85rem;white-space:nowrap}
 @media(max-width:480px){.bal-grid{grid-template-columns:1fr}.bal-item{border-right:none}.bal-item:last-child{border-bottom:none}.bal-item:nth-last-child(2){border-bottom:1px solid var(--border)}}
 </style>
 </head>
@@ -63,109 +63,114 @@ input::placeholder{color:var(--border2)}
 <div class="wrap">
   <header>
     <h1>分帳結算</h1>
-    <p class="sub">從 Notion 讀取支出 · 自動算出誰欠誰 · 結果寫回 Notion</p>
+    <p class="sub">自動從 Notion 讀取支出 · 算出誰欠誰 · 結果寫回 Notion</p>
   </header>
 
-  <!-- Token Section -->
-  <div id="token-section" class="card">
-    <div class="card-label">Notion Integration Token</div>
-    <div id="token-saved" style="display:none">
-      <div class="success-row">✓ Token 已儲存，連線中...</div>
+  <!-- Setup: Worker URL + Token -->
+  <div id="setup-section" class="card">
+    <div class="card-label">初始設定（只需做一次）</div>
+
+    <p style="font-size:.8rem;color:var(--ink2);margin-bottom:.75rem;line-height:1.6">
+      輸入你的 Cloudflare Worker 網址和 Notion Token，儲存後就不用再填了。
+    </p>
+
+    <div style="margin-bottom:.75rem">
+      <label style="font-size:.72rem;font-family:var(--mono);color:var(--ink3);letter-spacing:.06em;display:block;margin-bottom:.3rem">CLOUDFLARE WORKER 網址</label>
+      <input type="text" id="worker-url-input" placeholder="https://notion-split-proxy.你的帳號.workers.dev">
     </div>
-    <div id="token-input-area">
+
+    <div>
+      <label style="font-size:.72rem;font-family:var(--mono);color:var(--ink3);letter-spacing:.06em;display:block;margin-bottom:.3rem">NOTION TOKEN</label>
       <input type="password" id="token-input" placeholder="ntn_xxxxxxxxxxxxxxxx" autocomplete="off">
-      <p class="hint">輸入一次後自動記住，下次不用再填。Token 只存在你的瀏覽器，不會上傳到任何地方。</p>
-      <button class="btn btn-primary" onclick="saveToken()" style="margin-top:.75rem">儲存並連線</button>
     </div>
+
+    <p class="hint">資料只存在你的瀏覽器（localStorage），不會上傳到任何地方。</p>
+    <button class="btn btn-primary" onclick="saveSetup()">儲存並連線</button>
   </div>
 
-  <!-- Activity Section -->
-  <div id="activity-section" class="card" style="display:none">
-    <div class="card-label">選擇活動</div>
+  <!-- Main: Select activity + settle -->
+  <div id="main-section" class="card" style="display:none">
+    <div class="card-label">選擇活動並結算</div>
     <select id="activity-select">
       <option value="">載入中...</option>
     </select>
     <p class="hint">從你的「活動列表」資料庫自動載入</p>
-    <button class="btn btn-primary" id="calc-btn" onclick="doSettle()" style="margin-top:.75rem" disabled>讀取支出並結算</button>
+    <button class="btn btn-primary" id="calc-btn" onclick="doSettle()" disabled>讀取支出並結算</button>
     <div id="status"></div>
+    <div style="text-align:center">
+      <button class="btn-outline btn" onclick="showSetup()">重設連線設定</button>
+    </div>
   </div>
 
-  <!-- Result -->
   <div id="result"></div>
-
-  <!-- Reset token -->
-  <div id="reset-area" style="display:none;margin-top:1rem;text-align:center">
-    <button class="btn-outline btn" onclick="resetToken()" style="max-width:200px;width:auto;padding:.4rem 1rem;font-size:.78rem">重設 Token</button>
-  </div>
 </div>
 
 <script>
 const DB_EXPENSES = 'dcbbb86be66c4edf8f3bee4159e16744';
 const DB_ACTIVITIES = 'e17f055290e642a298d73d9922d46241';
-const STORAGE_KEY = 'notion_split_token';
+const STORAGE_TOKEN = 'notion_split_token';
+const STORAGE_WORKER = 'notion_split_worker';
 
 let token = '';
+let workerUrl = '';
 let activities = [];
-let currentActivityPage = null;
 
-function getHeaders() {
-  return {
-    'Authorization': 'Bearer ' + token,
-    'Content-Type': 'application/json',
-    'Notion-Version': '2022-06-28'
-  };
+function api(path, options = {}) {
+  const url = workerUrl.replace(/\/$/, '') + '/notion' + path;
+  return fetch(url, {
+    ...options,
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type': 'application/json',
+      'Notion-Version': '2022-06-28',
+      ...(options.headers || {}),
+    },
+  });
 }
 
-function setStatus(msg, loading=false) {
-  const el = document.getElementById('status');
-  el.innerHTML = loading ? `<span class="spinner"></span>${msg}` : msg;
+function setStatus(msg, loading = false) {
+  document.getElementById('status').innerHTML = loading
+    ? `<span class="spinner"></span>${msg}` : msg;
 }
 
-async function saveToken() {
-  const val = document.getElementById('token-input').value.trim();
-  if (!val || !val.startsWith('ntn_') && !val.startsWith('secret_')) {
-    setStatus('請輸入正確的 Token（ntn_ 或 secret_ 開頭）');
-    return;
-  }
-  token = val;
-  localStorage.setItem(STORAGE_KEY, token);
-  await initWithToken();
+async function saveSetup() {
+  const w = document.getElementById('worker-url-input').value.trim();
+  const t = document.getElementById('token-input').value.trim();
+  if (!w) { setStatus('請填入 Cloudflare Worker 網址'); return; }
+  if (!t) { setStatus('請填入 Notion Token'); return; }
+  workerUrl = w;
+  token = t;
+  localStorage.setItem(STORAGE_WORKER, w);
+  localStorage.setItem(STORAGE_TOKEN, t);
+  await initMain();
 }
 
-function resetToken() {
-  localStorage.removeItem(STORAGE_KEY);
-  token = '';
-  document.getElementById('token-saved').style.display = 'none';
-  document.getElementById('token-input-area').style.display = 'block';
-  document.getElementById('token-input').value = '';
-  document.getElementById('activity-section').style.display = 'none';
-  document.getElementById('reset-area').style.display = 'none';
+function showSetup() {
+  document.getElementById('setup-section').style.display = 'block';
+  document.getElementById('main-section').style.display = 'none';
   document.getElementById('result').innerHTML = '';
 }
 
-async function initWithToken() {
-  document.getElementById('token-input-area').style.display = 'none';
-  document.getElementById('token-saved').style.display = 'block';
-  document.getElementById('activity-section').style.display = 'block';
-  document.getElementById('reset-area').style.display = 'block';
+async function initMain() {
+  document.getElementById('setup-section').style.display = 'none';
+  document.getElementById('main-section').style.display = 'block';
   await loadActivities();
 }
 
 async function loadActivities() {
   setStatus('載入活動列表中...', true);
   try {
-    const res = await fetch(`https://api.notion.com/v1/databases/${DB_ACTIVITIES}/query`, {
+    const res = await api(`/v1/databases/${DB_ACTIVITIES}/query`, {
       method: 'POST',
-      headers: getHeaders(),
-      body: JSON.stringify({ page_size: 50 })
+      body: JSON.stringify({ page_size: 50 }),
     });
-    if (!res.ok) throw new Error('連線失敗，請確認 Token 是否正確，以及是否已授權活動列表資料庫');
+    if (!res.ok) throw new Error('連線失敗，請確認 Worker 網址和 Token 是否正確');
     const data = await res.json();
-    activities = data.results;
+    activities = data.results || [];
     const sel = document.getElementById('activity-select');
     sel.innerHTML = '<option value="">請選擇活動...</option>';
     activities.forEach(p => {
-      const name = p.properties['活動名稱']?.title?.[0]?.plain_text || '未命名活動';
+      const name = p.properties['活動名稱']?.title?.[0]?.plain_text || '未命名';
       const opt = document.createElement('option');
       opt.value = p.id;
       opt.textContent = name;
@@ -173,220 +178,156 @@ async function loadActivities() {
     });
     sel.onchange = () => {
       document.getElementById('calc-btn').disabled = !sel.value;
-      currentActivityPage = activities.find(a => a.id === sel.value) || null;
     };
-    setStatus('✓ 已連線，請選擇活動');
-    document.getElementById('calc-btn').disabled = true;
-  } catch(e) {
+    setStatus('✓ 連線成功，請選擇活動');
+  } catch (e) {
     setStatus('⚠ ' + e.message);
-    document.getElementById('token-input-area').style.display = 'block';
-    document.getElementById('token-saved').style.display = 'none';
+    showSetup();
   }
 }
 
 async function loadExpenses(activityName) {
-  let expenses = [];
-  let cursor = undefined;
-  while(true) {
+  let all = [], cursor;
+  while (true) {
     const body = {
       page_size: 100,
-      filter: {
-        property: '所屬活動',
-        rich_text: { contains: activityName }
-      }
+      filter: { property: '所屬活動', rich_text: { contains: activityName } },
     };
     if (cursor) body.start_cursor = cursor;
-    const res = await fetch(`https://api.notion.com/v1/databases/${DB_EXPENSES}/query`, {
+    const res = await api(`/v1/databases/${DB_EXPENSES}/query`, {
       method: 'POST',
-      headers: getHeaders(),
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
     if (!res.ok) {
       const err = await res.json();
       throw new Error(err.message || '讀取支出失敗，請確認已授權支出明細資料庫');
     }
     const data = await res.json();
-    expenses = expenses.concat(data.results);
+    all = all.concat(data.results || []);
     if (!data.has_more) break;
     cursor = data.next_cursor;
   }
-  return expenses;
+  return all;
 }
 
 function parsePeople(str) {
-  if (!str) return [];
-  return str.split(/[、，,\s]+/).map(s => s.trim()).filter(Boolean);
+  return (str || '').split(/[、，,\s]+/).map(s => s.trim()).filter(Boolean);
 }
 
 function calcSettlement(expenses) {
   const balance = {};
-  const expList = [];
-
+  let total = 0;
   expenses.forEach(p => {
     const props = p.properties;
-    const item = props['支出項目']?.title?.[0]?.plain_text || '';
     const amount = props['金額']?.number || 0;
     const payer = props['付款人']?.rich_text?.[0]?.plain_text || '';
-    const splitRaw = props['分攤人員']?.rich_text?.[0]?.plain_text || '';
-    const splitPeople = parsePeople(splitRaw);
-    if (!payer || amount <= 0 || splitPeople.length === 0) return;
-    expList.push({ item, amount, payer, splitPeople });
-    if (!balance[payer]) balance[payer] = 0;
-    balance[payer] += amount;
-    splitPeople.forEach(person => {
-      if (!balance[person]) balance[person] = 0;
-      balance[person] -= amount / splitPeople.length;
-    });
+    const splitPeople = parsePeople(props['分攤人員']?.rich_text?.[0]?.plain_text || '');
+    if (!payer || amount <= 0 || !splitPeople.length) return;
+    total += amount;
+    balance[payer] = (balance[payer] || 0) + amount;
+    splitPeople.forEach(p => { balance[p] = (balance[p] || 0) - amount / splitPeople.length; });
   });
+  Object.keys(balance).forEach(k => { balance[k] = Math.round(balance[k]); });
 
-  Object.keys(balance).forEach(k => balance[k] = Math.round(balance[k]));
-
-  const creditors = Object.entries(balance).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]).map(([n,v]) => ({name:n,val:v}));
-  const debtors = Object.entries(balance).filter(([,v]) => v < 0).sort((a,b) => a[1]-b[1]).map(([n,v]) => ({name:n,val:-v}));
+  const c = Object.entries(balance).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]).map(([n,v]) => ({name:n,val:v}));
+  const d = Object.entries(balance).filter(([,v]) => v < 0).sort((a,b) => a[1]-b[1]).map(([n,v]) => ({name:n,val:-v}));
   const transfers = [];
-  let ci=0, di=0;
-  const c = creditors.map(x=>({...x})), d = debtors.map(x=>({...x}));
-  while(ci<c.length && di<d.length) {
+  let ci = 0, di = 0;
+  while (ci < c.length && di < d.length) {
     const amt = Math.min(c[ci].val, d[di].val);
-    if (amt > 0) transfers.push({from: d[di].name, to: c[ci].name, amount: amt});
+    if (amt > 0) transfers.push({ from: d[di].name, to: c[ci].name, amount: amt });
     c[ci].val -= amt; d[di].val -= amt;
     if (c[ci].val < 1) ci++;
     if (d[di].val < 1) di++;
   }
-  const total = expList.reduce((s,e) => s+e.amount, 0);
-  return { balance, transfers, total, expList };
+  return { balance, transfers, total };
 }
 
-async function writeResultToNotion(activityPageId, activityName, settlement) {
+async function writeToNotion(activityPageId, activityName, settlement) {
   const { balance, transfers, total } = settlement;
-  const now = new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
+  const now = new Date().toLocaleDateString('zh-TW');
 
-  let balTable = `| 姓名 | 已付出 | 差額 | 狀態 |\n| --- | --- | --- | --- |\n`;
-  Object.entries(balance).sort((a,b)=>b[1]-a[1]).forEach(([name,val]) => {
-    const status = val > 0 ? '💰 應收' : val < 0 ? '💸 欠錢' : '✅ 平帳';
-    const diff = val > 0 ? `+$${val.toLocaleString()}` : val < 0 ? `-$${Math.abs(val).toLocaleString()}` : '$0';
-    balTable += `| ${name} | — | ${diff} | ${status} |\n`;
-  });
+  const children = [
+    { object: 'block', type: 'callout', callout: {
+      rich_text: [{ type: 'text', text: { content: `自動結算 · ${now}` } }],
+      icon: { type: 'emoji', emoji: '🤖' }, color: 'gray_background'
+    }},
+    { object: 'block', type: 'heading_2', heading_2: {
+      rich_text: [{ type: 'text', text: { content: '每人帳目' } }]
+    }},
+    { object: 'block', type: 'paragraph', paragraph: {
+      rich_text: [{ type: 'text', text: { content: `總支出 $${total.toLocaleString()}　共 ${Object.keys(balance).length} 人` }, annotations: { bold: true } }]
+    }},
+    ...Object.entries(balance).sort((a,b) => b[1]-a[1]).map(([name, val]) => ({
+      object: 'block', type: 'paragraph', paragraph: {
+        rich_text: [
+          { type: 'text', text: { content: `${name}　` }, annotations: { bold: true } },
+          { type: 'text', text: { content: val > 0 ? `應收 $${val.toLocaleString()}` : val < 0 ? `欠 $${Math.abs(val).toLocaleString()}` : '平帳' },
+            annotations: { color: val > 0 ? 'green' : val < 0 ? 'red' : 'gray' } }
+        ]
+      }
+    })),
+    { object: 'block', type: 'heading_2', heading_2: {
+      rich_text: [{ type: 'text', text: { content: '轉帳清單' } }]
+    }},
+    ...(transfers.length === 0
+      ? [{ object: 'block', type: 'paragraph', paragraph: { rich_text: [{ type: 'text', text: { content: '大家都平帳，不需要轉帳！' } }] } }]
+      : transfers.map(t => ({
+          object: 'block', type: 'paragraph', paragraph: {
+            rich_text: [
+              { type: 'text', text: { content: `${t.from}` }, annotations: { bold: true } },
+              { type: 'text', text: { content: '  →  ' } },
+              { type: 'text', text: { content: `${t.to}` }, annotations: { bold: true } },
+              { type: 'text', text: { content: `  $${t.amount.toLocaleString()}` }, annotations: { color: 'green', bold: true } }
+            ]
+          }
+        }))
+    ),
+  ];
 
-  let transferTable = `| 從 | 到 | 金額 |\n| --- | --- | --- |\n`;
-  if (transfers.length === 0) {
-    transferTable = '大家都平帳了，不需要轉帳！';
-  } else {
-    transfers.forEach(t => {
-      transferTable += `| ${t.from} | ${t.to} | **$${t.amount.toLocaleString()}** |\n`;
-    });
-  }
-
-  const content = `> 由分帳結算網頁自動計算 · 最後更新：${now}\n\n## 帳目總覽\n\n總支出：**$${total.toLocaleString()}**　｜　共 ${Object.keys(balance).length} 人\n\n${balTable}\n## 轉帳清單\n\n${transferTable}`;
-
-  // Find existing settlement page or create new one
-  const searchRes = await fetch(`https://api.notion.com/v1/search`, {
+  const res = await api('/v1/pages', {
     method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify({ query: `結算 ${activityName}`, filter: { value: 'page', property: 'object' } })
-  });
-  const searchData = await searchRes.json();
-  const existingPage = searchData.results?.find(p => p.properties?.title?.title?.[0]?.plain_text?.includes(activityName));
-
-  if (existingPage) {
-    await fetch(`https://api.notion.com/v1/blocks/${existingPage.id}/children`, {
-      method: 'GET', headers: getHeaders()
-    });
-    // Update via PATCH children - simpler: just patch the page title to force update signal
-  }
-
-  // Create new result page under the activity page
-  const createRes = await fetch('https://api.notion.com/v1/pages', {
-    method: 'POST',
-    headers: getHeaders(),
     body: JSON.stringify({
       parent: { page_id: activityPageId },
       icon: { type: 'emoji', emoji: '✅' },
-      properties: {
-        title: { title: [{ text: { content: `結算結果 · ${now}` } }] }
-      },
-      children: [
-        {
-          object: 'block', type: 'callout',
-          callout: {
-            rich_text: [{ type: 'text', text: { content: `由分帳結算網頁自動計算 · 最後更新：${now}` } }],
-            icon: { type: 'emoji', emoji: '🤖' }, color: 'gray_background'
-          }
-        },
-        {
-          object: 'block', type: 'heading_2',
-          heading_2: { rich_text: [{ type: 'text', text: { content: '帳目總覽' } }] }
-        },
-        {
-          object: 'block', type: 'paragraph',
-          paragraph: { rich_text: [{ type: 'text', text: { content: `總支出：$${total.toLocaleString()}　｜　共 ${Object.keys(balance).length} 人` }, annotations: { bold: false } }] }
-        },
-        ...Object.entries(balance).sort((a,b)=>b[1]-a[1]).map(([name,val]) => ({
-          object: 'block', type: 'paragraph',
-          paragraph: {
-            rich_text: [
-              { type: 'text', text: { content: `${name}　` }, annotations: { bold: true } },
-              { type: 'text', text: { content: val > 0 ? `應收 $${val.toLocaleString()}` : val < 0 ? `欠錢 $${Math.abs(val).toLocaleString()}` : '平帳' },
-                annotations: { color: val > 0 ? 'green' : val < 0 ? 'red' : 'gray' } }
-            ]
-          }
-        })),
-        {
-          object: 'block', type: 'heading_2',
-          heading_2: { rich_text: [{ type: 'text', text: { content: '轉帳清單' } }] }
-        },
-        ...(transfers.length === 0
-          ? [{ object: 'block', type: 'paragraph', paragraph: { rich_text: [{ type: 'text', text: { content: '大家都平帳了，不需要轉帳！' } }] } }]
-          : transfers.map(t => ({
-              object: 'block', type: 'paragraph',
-              paragraph: {
-                rich_text: [
-                  { type: 'text', text: { content: `${t.from}` }, annotations: { bold: true } },
-                  { type: 'text', text: { content: `  →  ` } },
-                  { type: 'text', text: { content: `${t.to}` }, annotations: { bold: true } },
-                  { type: 'text', text: { content: `：$${t.amount.toLocaleString()}` }, annotations: { color: 'green' } }
-                ]
-              }
-            }))
-        )
-      ]
-    })
+      properties: { title: { title: [{ text: { content: `結算結果 · ${now}` } }] } },
+      children,
+    }),
   });
-  if (!createRes.ok) {
-    const err = await createRes.json();
+  if (!res.ok) {
+    const err = await res.json();
     throw new Error(err.message || '寫入 Notion 失敗');
   }
-  return await createRes.json();
+  return await res.json();
 }
 
 async function doSettle() {
   const sel = document.getElementById('activity-select');
   const activityId = sel.value;
-  const activityName = sel.options[sel.selectedIndex].text;
+  const activityName = sel.options[sel.selectedIndex]?.text;
   if (!activityId) return;
 
   document.getElementById('calc-btn').disabled = true;
   document.getElementById('result').innerHTML = '';
 
   try {
-    setStatus(`讀取「${activityName}」的支出中...`, true);
+    setStatus(`讀取「${activityName}」支出中...`, true);
     const expenses = await loadExpenses(activityName);
 
-    if (expenses.length === 0) {
-      setStatus(`⚠ 找不到「${activityName}」的支出記錄，請確認「所屬活動」欄位名稱一致`);
-      document.getElementById('calc-btn').disabled = false;
+    if (!expenses.length) {
+      setStatus(`⚠ 找不到「${activityName}」的支出，請確認「所屬活動」欄位名稱一致`);
       return;
     }
 
-    setStatus(`計算結算結果中（共 ${expenses.length} 筆）...`, true);
+    setStatus(`計算中（共 ${expenses.length} 筆支出）...`, true);
     const settlement = calcSettlement(expenses);
 
     setStatus('寫入 Notion...', true);
-    const newPage = await writeResultToNotion(activityId, activityName, settlement);
+    const page = await writeToNotion(activityId, activityName, settlement);
 
     setStatus('');
-    renderResult(settlement, activityName, newPage?.url);
-  } catch(e) {
+    renderResult(settlement, activityName, page?.url);
+  } catch (e) {
     setStatus('⚠ ' + e.message);
   } finally {
     document.getElementById('calc-btn').disabled = false;
@@ -395,23 +336,19 @@ async function doSettle() {
 
 function renderResult(settlement, activityName, notionUrl) {
   const { balance, transfers, total } = settlement;
-  let html = '';
-
-  // Summary
-  html += `<div class="result-block">
+  let html = `<div class="result-block">
     <div class="result-head"><span>${activityName} · 帳目</span><span>總計 $${total.toLocaleString()}</span></div>
     <div class="bal-grid">`;
-  Object.entries(balance).sort((a,b)=>b[1]-a[1]).forEach(([name,val]) => {
-    const cls = val>0?'amt-pos':val<0?'amt-neg':'amt-zero';
-    const label = val>0?`+$${val.toLocaleString()}`:val<0?`-$${Math.abs(val).toLocaleString()}`:'平帳';
+  Object.entries(balance).sort((a,b) => b[1]-a[1]).forEach(([name, val]) => {
+    const cls = val > 0 ? 'amt-pos' : val < 0 ? 'amt-neg' : 'amt-zero';
+    const label = val > 0 ? `+$${val.toLocaleString()}` : val < 0 ? `-$${Math.abs(val).toLocaleString()}` : '平帳';
     html += `<div class="bal-item"><span style="font-weight:500">${name}</span><span class="amt ${cls}">${label}</span></div>`;
   });
   html += `</div></div>`;
 
-  // Transfers
   html += `<div class="result-block">
     <div class="result-head"><span>轉帳清單</span><span>${transfers.length} 筆</span></div>`;
-  if (transfers.length === 0) {
+  if (!transfers.length) {
     html += `<div class="settled">大家都平帳了，不需要轉帳！</div>`;
   } else {
     transfers.forEach(t => {
@@ -425,25 +362,22 @@ function renderResult(settlement, activityName, notionUrl) {
   }
   html += `</div>`;
 
-  // Notion link
   if (notionUrl) {
-    html += `<div style="text-align:center;margin-top:.5rem">
-      <a href="${notionUrl}" target="_blank" style="font-size:.75rem;font-family:var(--mono);color:var(--accent);text-decoration:none;letter-spacing:.04em">
-        ✓ 已寫入 Notion →
-      </a>
-    </div>`;
+    html += `<a class="notion-link" href="${notionUrl}" target="_blank">✓ 已寫入 Notion，點此查看 →</a>`;
   }
 
   document.getElementById('result').innerHTML = html;
-  document.getElementById('result').scrollIntoView({behavior:'smooth', block:'nearest'});
+  document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// Init
 window.onload = () => {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) {
-    token = saved;
-    initWithToken();
+  const w = localStorage.getItem(STORAGE_WORKER);
+  const t = localStorage.getItem(STORAGE_TOKEN);
+  if (w && t) {
+    workerUrl = w; token = t;
+    document.getElementById('worker-url-input').value = w;
+    document.getElementById('token-input').value = t;
+    initMain();
   }
 };
 </script>
