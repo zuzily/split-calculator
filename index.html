@@ -3,512 +3,449 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>分帳計算機</title>
+<title>分帳結算</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #F7F5F0;
-    --card: #FFFFFF;
-    --ink: #1A1A1A;
-    --ink2: #555550;
-    --ink3: #999990;
-    --accent: #2D5A3D;
-    --accent-light: #EAF2EC;
-    --accent2: #C8512A;
-    --accent2-light: #FDF0EB;
-    --border: #E5E2DA;
-    --border2: #D0CCC4;
-    --mono: 'DM Mono', monospace;
-    --sans: 'Noto Sans TC', sans-serif;
-  }
-
-  body {
-    font-family: var(--sans);
-    background: var(--bg);
-    color: var(--ink);
-    min-height: 100vh;
-    padding: 2rem 1rem 4rem;
-  }
-
-  .container {
-    max-width: 680px;
-    margin: 0 auto;
-  }
-
-  header {
-    margin-bottom: 2.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1.5px solid var(--ink);
-  }
-
-  .header-top {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-    margin-bottom: 0.25rem;
-  }
-
-  h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    color: var(--ink);
-  }
-
-  .subtitle {
-    font-size: 0.8rem;
-    color: var(--ink3);
-    font-family: var(--mono);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-
-  .section {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .section-label {
-    font-size: 0.7rem;
-    font-family: var(--mono);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink3);
-    margin-bottom: 1rem;
-  }
-
-  /* Activity name */
-  .activity-input {
-    width: 100%;
-    font-family: var(--sans);
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: var(--ink);
-    background: transparent;
-    border: none;
-    border-bottom: 1.5px solid var(--border2);
-    padding: 0.25rem 0;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .activity-input:focus { border-bottom-color: var(--accent); }
-  .activity-input::placeholder { color: var(--ink3); font-weight: 400; }
-
-  /* Expense rows */
-  .expense-list { display: flex; flex-direction: column; gap: 0.75rem; }
-
-  .expense-row {
-    display: grid;
-    grid-template-columns: 1fr 90px 110px 32px;
-    gap: 0.5rem;
-    align-items: start;
-    padding: 0.75rem;
-    background: var(--bg);
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    transition: border-color 0.15s;
-  }
-  .expense-row:focus-within { border-color: var(--border2); }
-
-  .input-group { display: flex; flex-direction: column; gap: 0.2rem; }
-  .input-group label { font-size: 0.65rem; font-family: var(--mono); color: var(--ink3); letter-spacing: 0.06em; text-transform: uppercase; }
-
-  .field {
-    font-family: var(--sans);
-    font-size: 0.875rem;
-    color: var(--ink);
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid var(--border);
-    padding: 0.2rem 0;
-    outline: none;
-    width: 100%;
-    transition: border-color 0.15s;
-  }
-  .field:focus { border-bottom-color: var(--accent); }
-  .field::placeholder { color: var(--border2); }
-  .field[type=number] { font-family: var(--mono); }
-
-  .field-split {
-    font-size: 0.8rem;
-    resize: none;
-    height: 44px;
-    line-height: 1.4;
-  }
-
-  .remove-btn {
-    width: 28px; height: 28px;
-    border: 1px solid var(--border2);
-    background: transparent;
-    border-radius: 6px;
-    cursor: pointer;
-    color: var(--ink3);
-    font-size: 1rem;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s;
-    margin-top: 18px;
-    flex-shrink: 0;
-  }
-  .remove-btn:hover { background: var(--accent2-light); border-color: var(--accent2); color: var(--accent2); }
-
-  .add-btn {
-    width: 100%;
-    padding: 0.6rem;
-    margin-top: 0.5rem;
-    background: transparent;
-    border: 1.5px dashed var(--border2);
-    border-radius: 8px;
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    color: var(--ink3);
-    cursor: pointer;
-    letter-spacing: 0.05em;
-    transition: all 0.15s;
-  }
-  .add-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-
-  .calc-btn {
-    width: 100%;
-    padding: 0.9rem;
-    background: var(--ink);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-family: var(--sans);
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    letter-spacing: 0.02em;
-    transition: all 0.2s;
-    margin-top: 0.5rem;
-  }
-  .calc-btn:hover { background: var(--accent); transform: translateY(-1px); }
-  .calc-btn:active { transform: translateY(0); }
-
-  /* Results */
-  #result { margin-top: 1rem; }
-
-  .result-section {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 0.75rem;
-    animation: slideIn 0.3s ease;
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .result-header {
-    padding: 0.75rem 1.25rem;
-    background: var(--ink);
-    color: #fff;
-    font-size: 0.7rem;
-    font-family: var(--mono);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .result-header .total {
-    font-size: 0.85rem;
-    font-weight: 500;
-  }
-
-  .balance-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-  }
-
-  .balance-item {
-    padding: 0.875rem 1.25rem;
-    border-bottom: 1px solid var(--border);
-    border-right: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .balance-item:nth-child(even) { border-right: none; }
-  .balance-item:nth-last-child(-n+2) { border-bottom: none; }
-
-  .balance-name {
-    font-size: 0.875rem;
-    font-weight: 500;
-  }
-
-  .balance-amount {
-    font-family: var(--mono);
-    font-size: 0.8rem;
-    font-weight: 500;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-  }
-
-  .amount-pos { background: var(--accent-light); color: var(--accent); }
-  .amount-neg { background: var(--accent2-light); color: var(--accent2); }
-  .amount-zero { background: var(--bg); color: var(--ink3); }
-
-  .transfer-list { padding: 0.5rem 0; }
-
-  .transfer-item {
-    display: flex;
-    align-items: center;
-    padding: 0.75rem 1.25rem;
-    gap: 0.75rem;
-    border-bottom: 1px solid var(--border);
-    transition: background 0.1s;
-  }
-  .transfer-item:last-child { border-bottom: none; }
-  .transfer-item:hover { background: var(--bg); }
-
-  .t-from { font-size: 0.9rem; font-weight: 500; flex: 1; }
-  .t-arrow {
-    font-family: var(--mono);
-    color: var(--ink3);
-    font-size: 0.75rem;
-  }
-  .t-to { font-size: 0.9rem; font-weight: 500; flex: 1; text-align: right; }
-  .t-amount {
-    font-family: var(--mono);
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--accent);
-    min-width: 80px;
-    text-align: right;
-  }
-
-  .settled {
-    text-align: center;
-    padding: 2rem;
-    font-family: var(--mono);
-    font-size: 0.8rem;
-    color: var(--ink3);
-    letter-spacing: 0.05em;
-  }
-
-  .error-msg {
-    color: var(--accent2);
-    font-size: 0.8rem;
-    font-family: var(--mono);
-    padding: 0.5rem 0;
-  }
-
-  .hint {
-    font-size: 0.72rem;
-    color: var(--ink3);
-    margin-top: 0.4rem;
-    font-family: var(--mono);
-    line-height: 1.5;
-  }
-
-  @media (max-width: 500px) {
-    .expense-row {
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
-    }
-    .expense-row .input-group:nth-child(3) { grid-column: 1 / -1; }
-    .remove-btn { grid-column: 2; justify-self: end; margin-top: 0; }
-    .balance-grid { grid-template-columns: 1fr; }
-    .balance-item { border-right: none; }
-    .balance-item:last-child { border-bottom: none; }
-    .balance-item:nth-last-child(2) { border-bottom: 1px solid var(--border); }
-  }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F7F5F0;--card:#fff;--ink:#1A1A1A;--ink2:#555550;--ink3:#99998F;
+  --accent:#2D5A3D;--accent-l:#EAF2EC;--accent2:#C8512A;--accent2-l:#FDF0EB;
+  --border:#E5E2DA;--border2:#CCC9C0;--mono:'DM Mono',monospace;--sans:'Noto Sans TC',sans-serif;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);min-height:100vh;padding:2rem 1rem 5rem}
+.wrap{max-width:640px;margin:0 auto}
+header{margin-bottom:2rem;padding-bottom:1.25rem;border-bottom:1.5px solid var(--ink)}
+h1{font-size:1.6rem;font-weight:700;letter-spacing:-.03em}
+.sub{font-size:.72rem;font-family:var(--mono);color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-top:.2rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:.75rem}
+.card-label{font-size:.65rem;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:.75rem}
+input,select{width:100%;font-family:var(--sans);font-size:.9rem;color:var(--ink);background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:.55rem .75rem;outline:none;transition:border-color .15s}
+input:focus,select:focus{border-color:var(--accent)}
+input::placeholder{color:var(--border2)}
+.hint{font-size:.7rem;font-family:var(--mono);color:var(--ink3);margin-top:.4rem;line-height:1.5}
+.btn{width:100%;padding:.85rem;border:none;border-radius:10px;font-family:var(--sans);font-size:.9rem;font-weight:500;cursor:pointer;transition:all .2s;margin-top:.5rem}
+.btn-primary{background:var(--ink);color:#fff}.btn-primary:hover{background:var(--accent);transform:translateY(-1px)}
+.btn-primary:disabled{background:var(--border2);cursor:not-allowed;transform:none}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--ink2)}.btn-outline:hover{border-color:var(--ink);color:var(--ink)}
+.tag{display:inline-block;font-size:.65rem;font-family:var(--mono);padding:.2rem .5rem;border-radius:4px;letter-spacing:.04em}
+.tag-ok{background:var(--accent-l);color:var(--accent)}
+.tag-err{background:var(--accent2-l);color:var(--accent2)}
+#status{font-size:.78rem;font-family:var(--mono);color:var(--ink3);margin-top:.5rem;min-height:1.2rem;text-align:center}
+.spinner{display:inline-block;width:12px;height:12px;border:1.5px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin-right:6px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.result-block{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:.75rem;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.result-head{background:var(--ink);color:#fff;padding:.65rem 1.1rem;font-size:.65rem;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between}
+.bal-grid{display:grid;grid-template-columns:1fr 1fr}
+.bal-item{padding:.75rem 1.1rem;border-bottom:1px solid var(--border);border-right:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.875rem}
+.bal-item:nth-child(even){border-right:none}
+.bal-item:nth-last-child(-n+2){border-bottom:none}
+.amt{font-family:var(--mono);font-size:.78rem;font-weight:500;padding:.2rem .45rem;border-radius:4px}
+.amt-pos{background:var(--accent-l);color:var(--accent)}
+.amt-neg{background:var(--accent2-l);color:var(--accent2)}
+.amt-zero{background:var(--bg);color:var(--ink3)}
+.transfer-item{display:flex;align-items:center;gap:.75rem;padding:.7rem 1.1rem;border-bottom:1px solid var(--border);font-size:.875rem}
+.transfer-item:last-child{border-bottom:none}
+.t-from{font-weight:500;flex:1}
+.t-arrow{color:var(--ink3);font-family:var(--mono);font-size:.75rem}
+.t-to{font-weight:500;flex:1;text-align:right}
+.t-amt{font-family:var(--mono);font-weight:500;color:var(--accent);min-width:72px;text-align:right}
+.settled{text-align:center;padding:1.5rem;font-family:var(--mono);font-size:.78rem;color:var(--ink3)}
+.divider{display:flex;align-items:center;gap:.75rem;margin:.75rem 0}
+.divider-line{flex:1;height:1px;background:var(--border)}
+.divider-text{font-size:.65rem;font-family:var(--mono);color:var(--ink3);letter-spacing:.06em}
+#token-section{animation:fadeIn .3s ease}
+.success-row{display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--accent);font-family:var(--mono)}
+@media(max-width:480px){.bal-grid{grid-template-columns:1fr}.bal-item{border-right:none}.bal-item:last-child{border-bottom:none}.bal-item:nth-last-child(2){border-bottom:1px solid var(--border)}}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
   <header>
-    <div class="header-top">
-      <h1>分帳計算機</h1>
-    </div>
-    <p class="subtitle">出遊支出結算 · 誰付誰還一目了然</p>
+    <h1>分帳結算</h1>
+    <p class="sub">從 Notion 讀取支出 · 自動算出誰欠誰 · 結果寫回 Notion</p>
   </header>
 
-  <div class="section">
-    <div class="section-label">活動名稱</div>
-    <input class="activity-input" id="activity-name" placeholder="例：花蓮三天兩夜" type="text">
+  <!-- Token Section -->
+  <div id="token-section" class="card">
+    <div class="card-label">Notion Integration Token</div>
+    <div id="token-saved" style="display:none">
+      <div class="success-row">✓ Token 已儲存，連線中...</div>
+    </div>
+    <div id="token-input-area">
+      <input type="password" id="token-input" placeholder="ntn_xxxxxxxxxxxxxxxx" autocomplete="off">
+      <p class="hint">輸入一次後自動記住，下次不用再填。Token 只存在你的瀏覽器，不會上傳到任何地方。</p>
+      <button class="btn btn-primary" onclick="saveToken()" style="margin-top:.75rem">儲存並連線</button>
+    </div>
   </div>
 
-  <div class="section">
-    <div class="section-label">支出明細</div>
-    <div class="expense-list" id="expense-list"></div>
-    <button class="add-btn" onclick="addExpense()">+ 新增一筆支出</button>
-    <p class="hint">分攤人員：用頓號（、）或逗號分隔，例如：小明、小美、阿偉</p>
+  <!-- Activity Section -->
+  <div id="activity-section" class="card" style="display:none">
+    <div class="card-label">選擇活動</div>
+    <select id="activity-select">
+      <option value="">載入中...</option>
+    </select>
+    <p class="hint">從你的「活動列表」資料庫自動載入</p>
+    <button class="btn btn-primary" id="calc-btn" onclick="doSettle()" style="margin-top:.75rem" disabled>讀取支出並結算</button>
+    <div id="status"></div>
   </div>
 
-  <button class="calc-btn" onclick="calculate()">計算結算結果</button>
-
+  <!-- Result -->
   <div id="result"></div>
+
+  <!-- Reset token -->
+  <div id="reset-area" style="display:none;margin-top:1rem;text-align:center">
+    <button class="btn-outline btn" onclick="resetToken()" style="max-width:200px;width:auto;padding:.4rem 1rem;font-size:.78rem">重設 Token</button>
+  </div>
 </div>
 
 <script>
-let expenseCount = 0;
+const DB_EXPENSES = 'dcbbb86be66c4edf8f3bee4159e16744';
+const DB_ACTIVITIES = 'e17f055290e642a298d73d9922d46241';
+const STORAGE_KEY = 'notion_split_token';
 
-function addExpense(item='', amount='', payer='', splitWith='') {
-  expenseCount++;
-  const id = expenseCount;
-  const list = document.getElementById('expense-list');
-  const div = document.createElement('div');
-  div.className = 'expense-row';
-  div.id = 'exp-' + id;
-  div.innerHTML = `
-    <div class="input-group">
-      <label>支出項目</label>
-      <input class="field" placeholder="例：午餐" value="${item}">
-    </div>
-    <div class="input-group">
-      <label>金額（元）</label>
-      <input class="field" type="number" placeholder="0" min="0" value="${amount}">
-    </div>
-    <div class="input-group">
-      <label>付款人</label>
-      <input class="field" placeholder="例：小明" value="${payer}">
-    </div>
-    <div class="input-group" style="grid-column: 1 / -1; margin-top: 0.25rem;">
-      <label>分攤人員（含付款人）</label>
-      <input class="field" placeholder="小明、小美、阿偉" value="${splitWith}">
-    </div>
-    <button class="remove-btn" onclick="removeExpense(${id})" title="刪除">×</button>
-  `;
-  // fix layout: put split field and remove btn in proper grid
-  div.style.gridTemplateColumns = '1fr 90px 110px 32px';
-  list.appendChild(div);
-  // re-arrange: split field spans full width
-  div.querySelector('.input-group:nth-child(4)').style.gridColumn = '1 / span 3';
+let token = '';
+let activities = [];
+let currentActivityPage = null;
+
+function getHeaders() {
+  return {
+    'Authorization': 'Bearer ' + token,
+    'Content-Type': 'application/json',
+    'Notion-Version': '2022-06-28'
+  };
 }
 
-function removeExpense(id) {
-  const rows = document.querySelectorAll('.expense-row');
-  if (rows.length <= 1) return;
-  document.getElementById('exp-' + id)?.remove();
+function setStatus(msg, loading=false) {
+  const el = document.getElementById('status');
+  el.innerHTML = loading ? `<span class="spinner"></span>${msg}` : msg;
+}
+
+async function saveToken() {
+  const val = document.getElementById('token-input').value.trim();
+  if (!val || !val.startsWith('ntn_') && !val.startsWith('secret_')) {
+    setStatus('請輸入正確的 Token（ntn_ 或 secret_ 開頭）');
+    return;
+  }
+  token = val;
+  localStorage.setItem(STORAGE_KEY, token);
+  await initWithToken();
+}
+
+function resetToken() {
+  localStorage.removeItem(STORAGE_KEY);
+  token = '';
+  document.getElementById('token-saved').style.display = 'none';
+  document.getElementById('token-input-area').style.display = 'block';
+  document.getElementById('token-input').value = '';
+  document.getElementById('activity-section').style.display = 'none';
+  document.getElementById('reset-area').style.display = 'none';
+  document.getElementById('result').innerHTML = '';
+}
+
+async function initWithToken() {
+  document.getElementById('token-input-area').style.display = 'none';
+  document.getElementById('token-saved').style.display = 'block';
+  document.getElementById('activity-section').style.display = 'block';
+  document.getElementById('reset-area').style.display = 'block';
+  await loadActivities();
+}
+
+async function loadActivities() {
+  setStatus('載入活動列表中...', true);
+  try {
+    const res = await fetch(`https://api.notion.com/v1/databases/${DB_ACTIVITIES}/query`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ page_size: 50 })
+    });
+    if (!res.ok) throw new Error('連線失敗，請確認 Token 是否正確，以及是否已授權活動列表資料庫');
+    const data = await res.json();
+    activities = data.results;
+    const sel = document.getElementById('activity-select');
+    sel.innerHTML = '<option value="">請選擇活動...</option>';
+    activities.forEach(p => {
+      const name = p.properties['活動名稱']?.title?.[0]?.plain_text || '未命名活動';
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = name;
+      sel.appendChild(opt);
+    });
+    sel.onchange = () => {
+      document.getElementById('calc-btn').disabled = !sel.value;
+      currentActivityPage = activities.find(a => a.id === sel.value) || null;
+    };
+    setStatus('✓ 已連線，請選擇活動');
+    document.getElementById('calc-btn').disabled = true;
+  } catch(e) {
+    setStatus('⚠ ' + e.message);
+    document.getElementById('token-input-area').style.display = 'block';
+    document.getElementById('token-saved').style.display = 'none';
+  }
+}
+
+async function loadExpenses(activityName) {
+  let expenses = [];
+  let cursor = undefined;
+  while(true) {
+    const body = {
+      page_size: 100,
+      filter: {
+        property: '所屬活動',
+        rich_text: { contains: activityName }
+      }
+    };
+    if (cursor) body.start_cursor = cursor;
+    const res = await fetch(`https://api.notion.com/v1/databases/${DB_EXPENSES}/query`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || '讀取支出失敗，請確認已授權支出明細資料庫');
+    }
+    const data = await res.json();
+    expenses = expenses.concat(data.results);
+    if (!data.has_more) break;
+    cursor = data.next_cursor;
+  }
+  return expenses;
 }
 
 function parsePeople(str) {
-  return str.split(/[、，,、\s]+/).map(s => s.trim()).filter(Boolean);
+  if (!str) return [];
+  return str.split(/[、，,\s]+/).map(s => s.trim()).filter(Boolean);
 }
 
-function calculate() {
-  const rows = document.querySelectorAll('.expense-row');
-  const expenses = [];
-
-  for (const row of rows) {
-    const inputs = row.querySelectorAll('input');
-    const item = inputs[0].value.trim();
-    const amount = parseFloat(inputs[1].value) || 0;
-    const payer = inputs[2].value.trim();
-    const splitRaw = inputs[3].value.trim();
-    const splitPeople = parsePeople(splitRaw);
-
-    if (!payer || amount <= 0 || splitPeople.length === 0) continue;
-    expenses.push({ item, amount, payer, splitPeople });
-  }
-
-  if (expenses.length === 0) {
-    document.getElementById('result').innerHTML =
-      '<p class="error-msg">請至少填入一筆有效支出（金額、付款人、分攤人員都要填）</p>';
-    return;
-  }
-
-  // Collect all people
-  const allPeople = new Set();
-  expenses.forEach(e => {
-    allPeople.add(e.payer);
-    e.splitPeople.forEach(p => allPeople.add(p));
-  });
-
-  // Calculate balance per person: positive = should receive, negative = owes
+function calcSettlement(expenses) {
   const balance = {};
-  allPeople.forEach(p => balance[p] = 0);
+  const expList = [];
 
-  expenses.forEach(e => {
-    const perPerson = e.amount / e.splitPeople.length;
-    balance[e.payer] += e.amount;
-    e.splitPeople.forEach(p => balance[p] -= perPerson);
+  expenses.forEach(p => {
+    const props = p.properties;
+    const item = props['支出項目']?.title?.[0]?.plain_text || '';
+    const amount = props['金額']?.number || 0;
+    const payer = props['付款人']?.rich_text?.[0]?.plain_text || '';
+    const splitRaw = props['分攤人員']?.rich_text?.[0]?.plain_text || '';
+    const splitPeople = parsePeople(splitRaw);
+    if (!payer || amount <= 0 || splitPeople.length === 0) return;
+    expList.push({ item, amount, payer, splitPeople });
+    if (!balance[payer]) balance[payer] = 0;
+    balance[payer] += amount;
+    splitPeople.forEach(person => {
+      if (!balance[person]) balance[person] = 0;
+      balance[person] -= amount / splitPeople.length;
+    });
   });
 
-  // Round
   Object.keys(balance).forEach(k => balance[k] = Math.round(balance[k]));
 
-  // Calculate minimum transfers
-  const creditors = Object.entries(balance).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]);
-  const debtors = Object.entries(balance).filter(([,v]) => v < 0).sort((a,b) => a[1]-b[1]);
+  const creditors = Object.entries(balance).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]).map(([n,v]) => ({name:n,val:v}));
+  const debtors = Object.entries(balance).filter(([,v]) => v < 0).sort((a,b) => a[1]-b[1]).map(([n,v]) => ({name:n,val:-v}));
   const transfers = [];
-  const c = creditors.map(([n,v]) => ({name: n, val: v}));
-  const d = debtors.map(([n,v]) => ({name: n, val: -v}));
-  let ci = 0, di = 0;
-  while (ci < c.length && di < d.length) {
+  let ci=0, di=0;
+  const c = creditors.map(x=>({...x})), d = debtors.map(x=>({...x}));
+  while(ci<c.length && di<d.length) {
     const amt = Math.min(c[ci].val, d[di].val);
     if (amt > 0) transfers.push({from: d[di].name, to: c[ci].name, amount: amt});
     c[ci].val -= amt; d[di].val -= amt;
     if (c[ci].val < 1) ci++;
     if (d[di].val < 1) di++;
   }
+  const total = expList.reduce((s,e) => s+e.amount, 0);
+  return { balance, transfers, total, expList };
+}
 
-  const total = expenses.reduce((s,e) => s+e.amount, 0);
-  const activityName = document.getElementById('activity-name').value.trim() || '本次旅遊';
+async function writeResultToNotion(activityPageId, activityName, settlement) {
+  const { balance, transfers, total } = settlement;
+  const now = new Date().toLocaleDateString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit'});
 
-  // Render
-  let html = '';
-
-  // Balance table
-  html += `<div class="result-section">
-    <div class="result-header">
-      <span>${activityName}｜每人帳目</span>
-      <span class="total">總計 $${total.toLocaleString()}</span>
-    </div>
-    <div class="balance-grid">`;
-
-  Object.entries(balance).sort((a,b) => b[1]-a[1]).forEach(([name, val]) => {
-    let cls = val > 0 ? 'amount-pos' : val < 0 ? 'amount-neg' : 'amount-zero';
-    let label = val > 0 ? `+$${val.toLocaleString()}` : val < 0 ? `-$${Math.abs(val).toLocaleString()}` : '平帳';
-    html += `<div class="balance-item">
-      <span class="balance-name">${name}</span>
-      <span class="balance-amount ${cls}">${label}</span>
-    </div>`;
+  let balTable = `| 姓名 | 已付出 | 差額 | 狀態 |\n| --- | --- | --- | --- |\n`;
+  Object.entries(balance).sort((a,b)=>b[1]-a[1]).forEach(([name,val]) => {
+    const status = val > 0 ? '💰 應收' : val < 0 ? '💸 欠錢' : '✅ 平帳';
+    const diff = val > 0 ? `+$${val.toLocaleString()}` : val < 0 ? `-$${Math.abs(val).toLocaleString()}` : '$0';
+    balTable += `| ${name} | — | ${diff} | ${status} |\n`;
   });
 
+  let transferTable = `| 從 | 到 | 金額 |\n| --- | --- | --- |\n`;
+  if (transfers.length === 0) {
+    transferTable = '大家都平帳了，不需要轉帳！';
+  } else {
+    transfers.forEach(t => {
+      transferTable += `| ${t.from} | ${t.to} | **$${t.amount.toLocaleString()}** |\n`;
+    });
+  }
+
+  const content = `> 由分帳結算網頁自動計算 · 最後更新：${now}\n\n## 帳目總覽\n\n總支出：**$${total.toLocaleString()}**　｜　共 ${Object.keys(balance).length} 人\n\n${balTable}\n## 轉帳清單\n\n${transferTable}`;
+
+  // Find existing settlement page or create new one
+  const searchRes = await fetch(`https://api.notion.com/v1/search`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify({ query: `結算 ${activityName}`, filter: { value: 'page', property: 'object' } })
+  });
+  const searchData = await searchRes.json();
+  const existingPage = searchData.results?.find(p => p.properties?.title?.title?.[0]?.plain_text?.includes(activityName));
+
+  if (existingPage) {
+    await fetch(`https://api.notion.com/v1/blocks/${existingPage.id}/children`, {
+      method: 'GET', headers: getHeaders()
+    });
+    // Update via PATCH children - simpler: just patch the page title to force update signal
+  }
+
+  // Create new result page under the activity page
+  const createRes = await fetch('https://api.notion.com/v1/pages', {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify({
+      parent: { page_id: activityPageId },
+      icon: { type: 'emoji', emoji: '✅' },
+      properties: {
+        title: { title: [{ text: { content: `結算結果 · ${now}` } }] }
+      },
+      children: [
+        {
+          object: 'block', type: 'callout',
+          callout: {
+            rich_text: [{ type: 'text', text: { content: `由分帳結算網頁自動計算 · 最後更新：${now}` } }],
+            icon: { type: 'emoji', emoji: '🤖' }, color: 'gray_background'
+          }
+        },
+        {
+          object: 'block', type: 'heading_2',
+          heading_2: { rich_text: [{ type: 'text', text: { content: '帳目總覽' } }] }
+        },
+        {
+          object: 'block', type: 'paragraph',
+          paragraph: { rich_text: [{ type: 'text', text: { content: `總支出：$${total.toLocaleString()}　｜　共 ${Object.keys(balance).length} 人` }, annotations: { bold: false } }] }
+        },
+        ...Object.entries(balance).sort((a,b)=>b[1]-a[1]).map(([name,val]) => ({
+          object: 'block', type: 'paragraph',
+          paragraph: {
+            rich_text: [
+              { type: 'text', text: { content: `${name}　` }, annotations: { bold: true } },
+              { type: 'text', text: { content: val > 0 ? `應收 $${val.toLocaleString()}` : val < 0 ? `欠錢 $${Math.abs(val).toLocaleString()}` : '平帳' },
+                annotations: { color: val > 0 ? 'green' : val < 0 ? 'red' : 'gray' } }
+            ]
+          }
+        })),
+        {
+          object: 'block', type: 'heading_2',
+          heading_2: { rich_text: [{ type: 'text', text: { content: '轉帳清單' } }] }
+        },
+        ...(transfers.length === 0
+          ? [{ object: 'block', type: 'paragraph', paragraph: { rich_text: [{ type: 'text', text: { content: '大家都平帳了，不需要轉帳！' } }] } }]
+          : transfers.map(t => ({
+              object: 'block', type: 'paragraph',
+              paragraph: {
+                rich_text: [
+                  { type: 'text', text: { content: `${t.from}` }, annotations: { bold: true } },
+                  { type: 'text', text: { content: `  →  ` } },
+                  { type: 'text', text: { content: `${t.to}` }, annotations: { bold: true } },
+                  { type: 'text', text: { content: `：$${t.amount.toLocaleString()}` }, annotations: { color: 'green' } }
+                ]
+              }
+            }))
+        )
+      ]
+    })
+  });
+  if (!createRes.ok) {
+    const err = await createRes.json();
+    throw new Error(err.message || '寫入 Notion 失敗');
+  }
+  return await createRes.json();
+}
+
+async function doSettle() {
+  const sel = document.getElementById('activity-select');
+  const activityId = sel.value;
+  const activityName = sel.options[sel.selectedIndex].text;
+  if (!activityId) return;
+
+  document.getElementById('calc-btn').disabled = true;
+  document.getElementById('result').innerHTML = '';
+
+  try {
+    setStatus(`讀取「${activityName}」的支出中...`, true);
+    const expenses = await loadExpenses(activityName);
+
+    if (expenses.length === 0) {
+      setStatus(`⚠ 找不到「${activityName}」的支出記錄，請確認「所屬活動」欄位名稱一致`);
+      document.getElementById('calc-btn').disabled = false;
+      return;
+    }
+
+    setStatus(`計算結算結果中（共 ${expenses.length} 筆）...`, true);
+    const settlement = calcSettlement(expenses);
+
+    setStatus('寫入 Notion...', true);
+    const newPage = await writeResultToNotion(activityId, activityName, settlement);
+
+    setStatus('');
+    renderResult(settlement, activityName, newPage?.url);
+  } catch(e) {
+    setStatus('⚠ ' + e.message);
+  } finally {
+    document.getElementById('calc-btn').disabled = false;
+  }
+}
+
+function renderResult(settlement, activityName, notionUrl) {
+  const { balance, transfers, total } = settlement;
+  let html = '';
+
+  // Summary
+  html += `<div class="result-block">
+    <div class="result-head"><span>${activityName} · 帳目</span><span>總計 $${total.toLocaleString()}</span></div>
+    <div class="bal-grid">`;
+  Object.entries(balance).sort((a,b)=>b[1]-a[1]).forEach(([name,val]) => {
+    const cls = val>0?'amt-pos':val<0?'amt-neg':'amt-zero';
+    const label = val>0?`+$${val.toLocaleString()}`:val<0?`-$${Math.abs(val).toLocaleString()}`:'平帳';
+    html += `<div class="bal-item"><span style="font-weight:500">${name}</span><span class="amt ${cls}">${label}</span></div>`;
+  });
   html += `</div></div>`;
 
-  // Transfer list
-  html += `<div class="result-section">
-    <div class="result-header"><span>轉帳清單</span><span>${transfers.length} 筆</span></div>`;
-
+  // Transfers
+  html += `<div class="result-block">
+    <div class="result-head"><span>轉帳清單</span><span>${transfers.length} 筆</span></div>`;
   if (transfers.length === 0) {
     html += `<div class="settled">大家都平帳了，不需要轉帳！</div>`;
   } else {
-    html += `<div class="transfer-list">`;
     transfers.forEach(t => {
       html += `<div class="transfer-item">
         <span class="t-from">${t.from}</span>
         <span class="t-arrow">→</span>
         <span class="t-to">${t.to}</span>
-        <span class="t-amount">$${t.amount.toLocaleString()}</span>
+        <span class="t-amt">$${t.amount.toLocaleString()}</span>
       </div>`;
     });
-    html += `</div>`;
   }
   html += `</div>`;
 
+  // Notion link
+  if (notionUrl) {
+    html += `<div style="text-align:center;margin-top:.5rem">
+      <a href="${notionUrl}" target="_blank" style="font-size:.75rem;font-family:var(--mono);color:var(--accent);text-decoration:none;letter-spacing:.04em">
+        ✓ 已寫入 Notion →
+      </a>
+    </div>`;
+  }
+
   document.getElementById('result').innerHTML = html;
-  document.getElementById('result').scrollIntoView({behavior: 'smooth', block: 'nearest'});
+  document.getElementById('result').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
-// Add 3 default rows
-addExpense();
-addExpense();
-addExpense();
+// Init
+window.onload = () => {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    token = saved;
+    initWithToken();
+  }
+};
 </script>
 </body>
 </html>
